@@ -1141,9 +1141,9 @@ const POSTGRES_PROOF_SAFE_FUNCTIONS: &[&str] = &[
 pub fn prove_read_only_for_database(sql: &str, database_type: DatabaseType) -> ReadProof {
     match database_type {
         DatabaseType::Mysql => prove_read_only_statement(sql, "mysql", MYSQL_PROOF_SAFE_FUNCTIONS),
-        DatabaseType::Postgres
-        | DatabaseType::Gaussdb
-        | DatabaseType::OpenGauss => prove_read_only_statement(sql, "postgres", POSTGRES_PROOF_SAFE_FUNCTIONS),
+        DatabaseType::Postgres | DatabaseType::Gaussdb | DatabaseType::OpenGauss => {
+            prove_read_only_statement(sql, "postgres", POSTGRES_PROOF_SAFE_FUNCTIONS)
+        }
         _ => ReadProof::Unproven,
     }
 }
@@ -1392,10 +1392,7 @@ mod tests {
             prove_read_only_for_database("UPDATE users SET x = 1", DatabaseType::OpenGauss),
             ReadProof::Unproven
         );
-        assert_eq!(
-            prove_read_only_for_database("SELECT nextval('seq')", DatabaseType::Gaussdb),
-            ReadProof::Unproven
-        );
+        assert_eq!(prove_read_only_for_database("SELECT nextval('seq')", DatabaseType::Gaussdb), ReadProof::Unproven);
     }
 
     #[test]
